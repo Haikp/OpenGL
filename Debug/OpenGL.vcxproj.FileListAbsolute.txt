@@ -1,1 +1,3 @@
 D:\CS\CS490\OpenGLProjects\Cherno\OpenGL\Debug\OpenGL.exe
+D:\CS\CS490\WindowsOpenGL\Debug\OpenGL.exe
+D:\CS\CS490\OpenGL\Debug\OpenGL.exe
