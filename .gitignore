@@ -6,7 +6,6 @@
 #THIS REPO SPECIFIC
 dependencies/
 src/vendor/
-imgui.ini
 
 # User-specific files
 *.rsuser
