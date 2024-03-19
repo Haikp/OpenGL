@@ -68,16 +68,16 @@ int main(void)
         float positions[] =
         {
             //positions      //colors
-             .5f,  .5f, .0f, 1.0f,  .0f,  .0f,
-            -.5f,  .5f, .0f,  .0f, 1.0f,  .0f,
-            -.5f, -.5f, .0f,  .0f,  .0f, 1.0f,
-            //.5f, -.5f, .0f, 1.0f, 1.0f,  .0f,
+             .5f,  .5f, .0f, 1.0f,  .0f,  .0f, //top right
+            -.5f,  .5f, .0f,  .0f, 1.0f,  .0f, //top left
+             .5f, -.5f, .0f, 1.0f, 1.0f,  .0f, //bottom right
+            -.5f, -.5f, .0f,  .0f,  .0f, 1.0f, //bottom left
         };
 
         unsigned int indices[] =
         {
-            0, 1, 2,
-            //0, 2, 3
+            0, 1, 2, 3
+            //0, 2, 3 
         };
 
         GLCall(glEnable(GL_BLEND));
@@ -86,9 +86,9 @@ int main(void)
         VertexArray va;
         va.Bind();
 
-        VertexBuffer vb(positions, 3 * 6 * sizeof(float));
+        VertexBuffer vb(positions, 4 * 6 * sizeof(float));
         vb.Bind();
-        IndexBuffer ib(indices, 3);
+        IndexBuffer ib(indices, 4);
         ib.Bind();
 
         VertexBufferLayout layout;
@@ -108,7 +108,7 @@ int main(void)
         shader.Unbind();
 
         glEnable(GL_DEPTH_TEST);
-        glPatchParameteri(GL_PATCH_VERTICES, 3);
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
 
         // Variables that help the rotation
         float rotation = 0.0f;
@@ -134,8 +134,9 @@ int main(void)
             camera.Inputs(window);
             camera.Matrix(45.0f, 0.1f, 100.0f, shader, "camMatrix", 0);
 
-            //renderer.Draw(va, ib, shader);
+            // renderer.Draw(va, ib, shader);
             glDrawElements(GL_PATCHES, ib.GetCount(), GL_UNSIGNED_INT, 0);
+            // glDrawArrays(GL_PATCHES, 0, 4);
 
             glfwSwapBuffers(window);
             glfwPollEvents();

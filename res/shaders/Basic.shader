@@ -8,20 +8,26 @@ uniform mat4 camMatrix;
 void main()
 {
 	gl_Position = camMatrix * vec4(aPos, 1.0f);
+	// gl_Position = vec4(aPos, 1.0f);
 }
 
 #shader tessellationctrl
 #version 460 core
 
-layout(vertices = 3) out;
+layout(vertices = 4) out;
 
 void main()
 {
-    gl_TessLevelOuter[0] = 8.0;
-    gl_TessLevelOuter[1] = 8.0;
-    gl_TessLevelOuter[2] = 8.0;
+    if (gl_InvocationID == 0)
+    {
+        gl_TessLevelOuter[0] = 4.0;
+        gl_TessLevelOuter[1] = 4.0;
+        gl_TessLevelOuter[2] = 4.0;
+        gl_TessLevelOuter[3] = 4.0;
 
-    gl_TessLevelInner[0] = 8.0;
+        gl_TessLevelInner[0] = 4.0;
+        gl_TessLevelInner[1] = 4.0;
+    }
 
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 }
@@ -29,7 +35,7 @@ void main()
 #shader tessellationeval
 #version 460 core
 
-layout(triangles, equal_spacing, ccw) in;
+layout(quads, equal_spacing, ccw) in;
 
 vec4 interpolate(vec4 v0, vec4 v1, vec4 v2, vec4 v3)
 {
@@ -45,16 +51,17 @@ vec4 interpolate2D(vec4 v0, vec4 v1, vec4 v2)
 
 void main()
 {
-    gl_Position = interpolate2D(gl_in[0].gl_Position,
-                                gl_in[1].gl_Position,
-                                gl_in[2].gl_Position);
+    gl_Position = interpolate(gl_in[0].gl_Position,
+                              gl_in[1].gl_Position,
+                              gl_in[2].gl_Position,
+                              gl_in[3].gl_Position);
 }
 
 #shader geometry
 #version 460 core
 
 layout (triangles) in;
-layout (line_strip, max_vertices = 20) out;
+layout (line_strip, max_vertices = 3) out;
 
 void main()
 {
