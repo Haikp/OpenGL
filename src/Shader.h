@@ -8,6 +8,9 @@
 struct ShaderProgramSource
 {
     std::string VertexSource;
+	std::string TessellationCtrlSource;
+	std::string TessellationEvalSource;
+	std::string GeometrySource;
     std::string FragmentSource;
 };
 
@@ -32,6 +35,6 @@ public:
 private:
 	ShaderProgramSource ParseShader(const std::string& filepath);
 	unsigned int CompileShader(unsigned int type, const std::string& source);
-	unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
+	unsigned int CreateShader(const std::string& vertexShader, const std::string& tessellationEvalSource, const std::string& tessellationCtrlSource, const std::string& geometrySource, const std::string& fragmentShader);
 	unsigned int GetUniformLocation(const std::string& name);
 };

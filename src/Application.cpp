@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 #include "Renderer.h"
 #include "VertexBuffer.h"
@@ -13,12 +14,15 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Camera.h"
+//#include "Plane.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
 int main(void)
 {
@@ -30,7 +34,8 @@ int main(void)
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
     static int width = 800;
     static int height = 800;
@@ -42,7 +47,6 @@ int main(void)
         glfwTerminate();
         return -1;
     }
-
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -57,24 +61,23 @@ int main(void)
 
     std::cout << glGetString(GL_VERSION) << std::endl;
 
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(debugCallback, 0);
+
     {
         float positions[] =
         {
-            -0.5f, 0.0f,  0.5f,     1.00f, 0.70f, 0.44f,	0.0f, 0.0f,
-            -0.5f, 0.0f, -0.5f,     0.83f, 1.00f, 0.44f,	5.0f, 0.0f,
-             0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 1.00f,	0.0f, 0.0f,
-             0.5f, 0.0f,  0.5f,     1.00f, 1.00f, 0.44f,	5.0f, 0.0f,
-             0.0f, 0.8f,  0.0f,     1.00f, 0.86f, 1.00f,	2.5f, 5.0f
+            //positions      //colors
+             .5f,  .5f, .0f, 1.0f,  .0f,  .0f,
+            -.5f,  .5f, .0f,  .0f, 1.0f,  .0f,
+            -.5f, -.5f, .0f,  .0f,  .0f, 1.0f,
+            //.5f, -.5f, .0f, 1.0f, 1.0f,  .0f,
         };
 
-        unsigned int indicies[18] =
+        unsigned int indices[] =
         {
             0, 1, 2,
-            0, 2, 3,
-            0, 1, 4,
-            1, 2, 4,
-            2, 3, 4,
-            3, 0, 4
+            //0, 2, 3
         };
 
         GLCall(glEnable(GL_BLEND));
@@ -83,15 +86,14 @@ int main(void)
         VertexArray va;
         va.Bind();
 
-        VertexBuffer vb(positions, 5 * 8 * sizeof(float));
+        VertexBuffer vb(positions, 3 * 6 * sizeof(float));
         vb.Bind();
-        IndexBuffer ib(indicies, 18);
+        IndexBuffer ib(indices, 3);
         ib.Bind();
 
         VertexBufferLayout layout;
         layout.Push<float>(3);
         layout.Push<float>(3);
-        layout.Push<float>(2);
 
         va.AddBuffer(vb, layout);
 
@@ -106,8 +108,9 @@ int main(void)
         shader.Unbind();
 
         glEnable(GL_DEPTH_TEST);
+        glPatchParameteri(GL_PATCH_VERTICES, 3);
 
-        // Variables that help the rotation of the pyramid
+        // Variables that help the rotation
         float rotation = 0.0f;
         double prevTime = glfwGetTime();
 
@@ -115,7 +118,7 @@ int main(void)
 
         while (!glfwWindowShouldClose(window))
         {
-            glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+            glClearColor(.0f, .0f, .0f, 1.f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             double crntTime = glfwGetTime();
@@ -129,9 +132,10 @@ int main(void)
             va.Bind();
 
             camera.Inputs(window);
-            camera.Matrix(45.0f, 0.1f, 100.0f, shader, "camMatrix", rotation);
+            camera.Matrix(45.0f, 0.1f, 100.0f, shader, "camMatrix", 0);
 
-            renderer.Draw(va, ib, shader);
+            //renderer.Draw(va, ib, shader);
+            glDrawElements(GL_PATCHES, ib.GetCount(), GL_UNSIGNED_INT, 0);
 
             glfwSwapBuffers(window);
             glfwPollEvents();
@@ -140,4 +144,10 @@ int main(void)
 
     glfwTerminate();
     return 0;
+}
+
+void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+    // Log or print the debug message details
+    // Example: Print the message to stderr
+    std::cerr << "OpenGL debug message: " << message << std::endl;
 }

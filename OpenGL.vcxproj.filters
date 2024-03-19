@@ -1380,6 +1380,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="res\shaders\test.shader" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\PogO.png">
