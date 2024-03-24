@@ -14,7 +14,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Camera.h"
-//#include "Plane.h"
+#include "Plane.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -65,20 +65,8 @@ int main(void)
     glDebugMessageCallback(debugCallback, 0);
 
     {
-        float positions[] =
-        {
-            //positions      //colors
-             .5f,  .5f, .0f, 1.0f,  .0f,  .0f, //top right
-            -.5f,  .5f, .0f,  .0f, 1.0f,  .0f, //top left
-             .5f, -.5f, .0f, 1.0f, 1.0f,  .0f, //bottom right
-            -.5f, -.5f, .0f,  .0f,  .0f, 1.0f, //bottom left
-        };
-
-        unsigned int indices[] =
-        {
-            0, 1, 2, 3
-            //0, 2, 3 
-        };
+        Plane plane;
+        plane.loadHeightMap("res/textures/Hills.png");
 
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -86,25 +74,31 @@ int main(void)
         VertexArray va;
         va.Bind();
 
-        VertexBuffer vb(positions, 4 * 6 * sizeof(float));
+        // VertexBuffer vb(positions, 6 * 6 * sizeof(float));
+        VertexBuffer vb(&plane.getVertices()[0], plane.getVertices().size() * sizeof(float));
         vb.Bind();
-        IndexBuffer ib(indices, 4);
-        ib.Bind();
+        //IndexBuffer ib(&plane.getIndices()[0], plane.getIndices().size());
+        //ib.Bind();
 
         VertexBufferLayout layout;
         layout.Push<float>(3);
-        layout.Push<float>(3);
+        layout.Push<float>(2);
+        // layout.Push<float>(3);
 
         va.AddBuffer(vb, layout);
 
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
 
+        //Texture texture("res/textures/Hills.png");
+        //texture.Bind();
+        //shader.SetUniform1i("u_Texture", 0);
+
         Renderer renderer;
 
         va.Unbind();
         vb.Unbind();
-        ib.Unbind();
+        //ib.Unbind();
         shader.Unbind();
 
         glEnable(GL_DEPTH_TEST);
@@ -135,8 +129,9 @@ int main(void)
             camera.Matrix(45.0f, 0.1f, 100.0f, shader, "camMatrix", 0);
 
             // renderer.Draw(va, ib, shader);
-            glDrawElements(GL_PATCHES, ib.GetCount(), GL_UNSIGNED_INT, 0);
-            // glDrawArrays(GL_PATCHES, 0, 4);
+            // glDrawElements(GL_PATCHES, ib.GetCount(), GL_UNSIGNED_INT, 0);
+            // 20 = rez = resolution value found in Plane.cpp
+            glDrawArrays(GL_PATCHES, 0, 4 * 20 * 20);
 
             glfwSwapBuffers(window);
             glfwPollEvents();
