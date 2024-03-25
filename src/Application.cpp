@@ -32,8 +32,8 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
@@ -66,8 +66,19 @@ int main(void)
     glDebugMessageCallback(debugCallback, 0);
 
     {
-        Plane plane;
-        plane.loadHeightMap("res/textures/Hills.png");
+        float positions[16] = {
+            //Verticies    //TexCoords
+             050.0f,  050.0f,  1.0f,  1.0f,   // 0 top right
+            -050.0f,  050.0f,  0.0f,  1.0f,   // 1 top left
+            -050.0f, -050.0f,  0.0f,  0.0f,   // 2 bot left
+             050.0f, -050.0f,  1.0f,  0.0f,   // 3 bot right
+        };
+
+
+        unsigned int indices[] = {
+            0, 1, 2,
+            0, 2, 3,
+        };
 
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -76,37 +87,32 @@ int main(void)
         va.Bind();
 
         // VertexBuffer vb(positions, 6 * 6 * sizeof(float));
-        VertexBuffer vb(&plane.getVertices()[0], plane.getVertices().size() * sizeof(float));
+        VertexBuffer vb(positions, 4 * 4 * sizeof(float));
         vb.Bind();
-        //IndexBuffer ib(&plane.getIndices()[0], plane.getIndices().size());
-        //ib.Bind();
+        IndexBuffer ib(indices, 6);
+        ib.Bind();
 
         VertexBufferLayout layout;
-        layout.Push<float>(3);
+        layout.Push<float>(2);
         layout.Push<float>(2);
         // layout.Push<float>(3);
 
         va.AddBuffer(vb, layout);
 
-        Shader shader("res/shaders/Basic.shader");
+        Shader shader("res/shaders/test.shader");
         shader.Bind();
 
-        //Texture texture("res/textures/Hills.png");
-        //texture.Bind(1);
-        //GLint boundTexture;
-        //glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
-        //if (boundTexture == 0)
-        //{
-        //    std::cout << "HELLO" << std::endl;
-        //}
-        //shader.SetUniform1i("u_Texture", 1);
+        Texture texture("res/textures/PogO.png");
+        texture.Bind();
+        shader.SetUniform1i("u_Texture", 0);
+
         shader.SetUniform4f("u_Color", .0f, .0f, .5f, 1.f);
 
         Renderer renderer;
 
         va.Unbind();
         vb.Unbind();
-        //ib.Unbind();
+        ib.Unbind();
         shader.Unbind();
 
         glEnable(GL_DEPTH_TEST);
@@ -136,10 +142,10 @@ int main(void)
             camera.Inputs(window);
             camera.Matrix(45.0f, 0.1f, 100.0f, shader, "camMatrix", 0);
 
-            // renderer.Draw(va, ib, shader);
+             renderer.Draw(va, ib, shader);
             // glDrawElements(GL_PATCHES, ib.GetCount(), GL_UNSIGNED_INT, 0);
             // 20 = rez = resolution value found in Plane.cpp
-            glDrawArrays(GL_PATCHES, 0, 4 * 20 * 20);
+            //glDrawArrays(GL_PATCHES, 0, 4 * 20 * 20);
 
             glfwSwapBuffers(window);
             glfwPollEvents();

@@ -139,9 +139,9 @@ unsigned int Shader::CreateShader(const std::string& vertexShader, const std::st
     unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
     glAttachShader(program, vs);
-    glAttachShader(program, tcs);
-    glAttachShader(program, tes);
-    glAttachShader(program, gs);
+    //glAttachShader(program, tcs);
+    //glAttachShader(program, tes);
+    //glAttachShader(program, gs);
     glAttachShader(program, fs);
     glLinkProgram(program);
     glValidateProgram(program);
