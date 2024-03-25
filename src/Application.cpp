@@ -62,6 +62,7 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
     glEnable(GL_DEBUG_OUTPUT);
+    //glEnable(GL_TEXTURE_2D);
     glDebugMessageCallback(debugCallback, 0);
 
     {
@@ -91,8 +92,15 @@ int main(void)
         shader.Bind();
 
         //Texture texture("res/textures/Hills.png");
-        //texture.Bind();
-        //shader.SetUniform1i("u_Texture", 0);
+        //texture.Bind(1);
+        //GLint boundTexture;
+        //glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
+        //if (boundTexture == 0)
+        //{
+        //    std::cout << "HELLO" << std::endl;
+        //}
+        //shader.SetUniform1i("u_Texture", 1);
+        shader.SetUniform4f("u_Color", .0f, .0f, .5f, 1.f);
 
         Renderer renderer;
 
